@@ -34,15 +34,15 @@ SELECT YEAR(order_date) AS 년도, customer_region AS 지역,
 				ORDER BY 2, 3 DESC, 1;
 -- -----------------------------------------------------------------------
 # 카테고리 연도별 증감률
-SELECT a.카테고리, (b.판매건수 - a.판매건수) AS 증가건수, ROUND(b.평균판매금액 - a.평균판매금액,2) AS 매출차이,
+SELECT a.카테고리, (b.판매건수 - a.판매건수) AS 증가건수, ROUND(b.총매출 - a.총매출,2) AS 매출차이,
  CONCAT(ROUND((b.판매건수 - a.판매건수) / a.판매건수 * 100, 2),'%') AS 증가율
 FROM 
-(SELECT product_category AS 카테고리, SUM(total_revenue) AS 평균판매금액, COUNT(*) AS 판매건수
+(SELECT product_category AS 카테고리, SUM(total_revenue) AS 총매출, COUNT(*) AS 판매건수
     FROM amazon_sales
 		WHERE YEAR(order_date) = 2022
 			GROUP BY product_category) a
 JOIN
-(SELECT product_category AS 카테고리, SUM(total_revenue) AS 평균판매금액, COUNT(*) AS 판매건수
+(SELECT product_category AS 카테고리, SUM(total_revenue) AS 총매출, COUNT(*) AS 판매건수
     FROM amazon_sales
 		WHERE YEAR(order_date) = 2023
 			GROUP BY product_category) b
@@ -50,18 +50,20 @@ JOIN
 			ORDER BY 1,4 DESC;
 -- -----------------------------------------------------------------------
 # 지역별 카테고리 연도별 증감률
-SELECT a.지역, a.카테고리, (b.판매건수 - a.판매건수) AS 증가건수, ROUND(b.평균판매금액 - a.평균판매금액,2) AS 매출차이,
+SELECT a.지역, a.카테고리, (b.판매건수 - a.판매건수) AS 증가건수, ROUND(b.총매출 - a.총매출,2) AS 매출차이,
 CONCAT(ROUND((b.판매건수 - a.판매건수) / a.판매건수 * 100, 2),'%') AS 증가율
 FROM 
-(SELECT customer_region AS 지역, product_category AS 카테고리, SUM(total_revenue) AS 평균판매금액,COUNT(*) AS 판매건수
+(SELECT customer_region AS 지역, product_category AS 카테고리, SUM(total_revenue) AS 총매출,COUNT(*) AS 판매건수
     FROM amazon_sales
 		WHERE YEAR(order_date) = 2022
 			GROUP BY customer_region, product_category) a
 JOIN 
-(SELECT customer_region AS 지역, product_category AS 카테고리, SUM(total_revenue) AS 평균판매금액, COUNT(*) AS 판매건수
+(SELECT customer_region AS 지역, product_category AS 카테고리, SUM(total_revenue) AS 총매출, COUNT(*) AS 판매건수
     FROM amazon_sales
 		WHERE YEAR(order_date) = 2023
 			GROUP BY customer_region, product_category) b
 	ON a.지역 = b.지역
 		AND a.카테고리 = b.카테고리
 			ORDER BY 1,5 DESC;
+-- ------------------------------------------------------------------------
+SELECT MIN(PRICE), MAX(PRICE) FROM amazon_sales;
